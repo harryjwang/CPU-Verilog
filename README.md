@@ -10,55 +10,22 @@ This project demonstrates the full hardware design workflow:
 Specification → RTL design → Simulation → Debugging → Integration → System-level verification.
 It highlights mastery of digital logic, Verilog RTL, modular design, and waveform-based debugging.
 
-                 ┌────────────────┐
-     clk,reset → │   Program      │
-                 │   Counter (PC) │
-                 └──────┬─────────┘
-                        │ PC
-                        ▼
-                 ┌────────────────┐
-                 │ Instruction     │ 32-bit instr
-                 │   Memory        ├──────────────┐
-                 └──────┬─────────┘              │
-                        │                        │
-                        │                        ▼
-                        │                 ┌───────────────┐
-                        │                 │   Control     │
-                        │                 │ (opcode/funct)│
-                        │                 └─┬───────┬─────┘
-                        │                   │       │
-                        │                   │       │ ALUOp
-                        │                   │       ▼
-                        │                   │  ┌───────────┐
-                        │                   │  │ ALU Ctl   │
-                        │                   │  └────┬──────┘
-                        │                   │       │ alu_sel
-                        │                   │       │
-                        ▼                   │       │
-               ┌────────────────┐           │       │
-    rs,rt,rd → │ Register File  │◄──────────┘       │
-  read_data1 ─►│  (2R/1W ports) │──────────────────►│
-  read_data2 ─►└──────┬─────────┘                  ▼
-                       │                  ┌────────────────┐
-                       │  imm[15:0]       │      ALU       │
-                       │───────────────┐  │ (add/and/or/   │
-                       ▼               │  │  shift, etc.)  │
-               ┌────────────┐          │  └───┬────────────┘
-               │ SignExtend │──────────┘      │ ALU result
-               └────┬───────┘                 │ zero
-                    │                         │
-           imm32 ───┘                         │
-                                              ▼
-                               ┌────────────────────────┐
-                        ┌─────►│   Data Memory          │
-                        │      │ (load/store, byte/word)│
-                        │      └─────────┬──────────────┘
-                        │                │ read_data
-                        │                │
-                        │         ┌──────▼──────┐
-                        │         │ Writeback   │
-                        └─────────┤   Mux       │───► RegFile write_data
-                                  └─────────────┘
+clk,reset → [ PC ] → [ Instruction Memory ] → [ Control ] → [ ALU Ctrl ]
+                    └────────────┬──────────┘                │
+                                 │                           ▼
+                     rs/rt/rd → [ Register File ] → data1 → [ ALU ] ← imm32 ← [ SignExt ]
+                                      └────────→ data2 ─────┘   │
+                                                                 │
+                                                result → [ Data Memory ] → read_data
+                                                          │                       │
+                                                          └──────────────┬────────┘
+                                                                         ▼
+                                                                  [ Writeback Mux ]
+                                                                         │
+                                                            write_data → [ Register File ]
+
+Branch/Jump:  ALU.zero + Control(Branch/Jump) → [ PC Select Mux ] → PC
+
 
 Branch/Jump path:
 - PC + 4 (or + imm<<2 for branch) selected via a PC mux using Control & ALU zero.
