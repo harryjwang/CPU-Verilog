@@ -10,21 +10,8 @@ This project demonstrates the full hardware design workflow:
 Specification → RTL design → Simulation → Debugging → Integration → System-level verification.
 It highlights mastery of digital logic, Verilog RTL, modular design, and waveform-based debugging.
 
-clk,reset → [ PC ] → [ Instruction Memory ] → [ Control ] → [ ALU Ctrl ]
-                    └────────────┬──────────┘                │
-                                 │                           ▼
-                     rs/rt/rd → [ Register File ] → data1 → [ ALU ] ← imm32 ← [ SignExt ]
-                                      └────────→ data2 ─────┘   │
-                                                                 │
-                                                result → [ Data Memory ] → read_data
-                                                          │                       │
-                                                          └──────────────┬────────┘
-                                                                         ▼
-                                                                  [ Writeback Mux ]
-                                                                         │
-                                                            write_data → [ Register File ]
 
-Branch/Jump:  ALU.zero + Control(Branch/Jump) → [ PC Select Mux ] → PC
+<img width="589" height="1194" alt="image" src="https://github.com/user-attachments/assets/fdbad3e7-a464-4a3d-8cdb-ab1d00763e1d" />
 
 
 Branch/Jump path:
